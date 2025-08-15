@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تأجير السيارات - براند MK</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      direction: rtl;
+      background: #f2f4f8;
+      padding: 20px;
+      color: #222;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d6efd;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .car-list {
+      margin-bottom: 40px;
+    }
+
+    .car {
+      display: flex;
+      align-items: center;
+      background: #f7f9fc;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+
+    .car:hover {
+      transform: scale(1.02);
+    }
+
+    .car img {
+      width: 130px;
+      height: 85px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-left: 20px;
+    }
+
+    .car-info h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .car-info p {
+      margin: 0;
+      font-size: 14px;
+      color: #555;
+    }
+
+    form h2 {
+      margin-bottom: 20px;
+      color: #0d6efd;
+      font-size: 20px;
+    }
+
+    form label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 14px;
+      color: #333;
+    }
+
+    form input,
+    form select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: border-color 0.3s ease;
+    }
+
+    form input:focus,
+    form select:focus {
+      border-color: #0d6efd;
+      outline: none;
+    }
+
+    form button {
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    form button:hover {
+      background-color: #0b5ed7;
+    }
+
+    #confirmation-message {
+      margin-top: 25px;
+      background: #d1e7dd;
+      color: #0f5132;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      color: #888;
+      font-size: 14px;
+    }
+
+    .social-links {
+      margin-top: 15px;
+    }
+
+    .social-links a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #0d6efd;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .social-links a:hover {
+      color: #084298;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>تأجير السيارات</h1>
+  <p class="subtitle">براند <strong>MK</strong> - تأجير سيارات متميزة</p>
+
+  <div class="container">
+
+    <div class="car-list" id="car-list">
+      <!-- سيتم عرض السيارات هنا -->
+    </div>
+
+    <form id="rental-form">
+      <h2>نموذج حجز سيارة</h2>
+
+      <label for="car-select">اختر السيارة</label>
+      <select id="car-select" required>
+        <option value="" disabled selected>-- اختر السيارة --</option>
+      </select>
+
+      <label for="customer-name">اسم العميل</label>
+      <input type="text" id="customer-name" placeholder="أدخل اسمك" required />
+
+      <label for="rental-date">تاريخ الحجز</label>
+      <input type="date" id="rental-date" required />
+
+      <button type="submit">احجز الآن</button>
+    </form>
+
+    <div id="confirmation-message"></div>
+
+  </div>
+
+  <footer>
+    هذا الموقع تحت إدارة المهندس محمد مخيمر
+
+    <div class="social-links">
+      <a href="https://www.instagram.com/mohamed.mahmoud06" target="_blank">📸 إنستغرام</a>
+      |
+      <a href="https://wa.me/201023824896" target="_blank">📱 واتساب</a>
+    </div>
+  </footer>
+
+  <script>
+    const cars = [
+      { id: 1, name: "تويوتا كورولا", price: 150, image: "https://cdn.pixabay.com/photo/2017/09/05/13/46/toyota-2718597_1280.jpg" },
+      { id: 2, name: "مرسيدس C-Class", price: 400, image: "https://cdn.pixabay.com/photo/2017/08/06/02/04/mercedes-benz-2585924_1280.jpg" },
+      { id: 3, name: "هيونداي أكسنت", price: 130, image: "https://cdn.pixabay.com/photo/2017/10/24/14/40/car-2887419_1280.jpg" }
+    ];
+
+    const carListDiv = document.getElementById('car-list');
+    const carSelect = document.getElementById('car-select');
+
+    function displayCars() {
+      carListDiv.innerHTML = '';
+      cars.forEach(car => {
+        const carDiv = document.createElement('div');
+        carDiv.className = 'car';
+        carDiv.innerHTML = `
+          <img src="${car.image}" alt="${car.name}" />
+          <div class="car-info">
+            <h3>${car.name}</h3>
+            <p>السعر: ${car.price} جنيه/يوم</p>
+          </div>
+        `;
+        carListDiv.appendChild(carDiv);
+
+        const option = document.createElement('option');
+        option.value = car.id;
+        option.textContent = car.name;
+        carSelect.appendChild(option);
+      });
+    }
+
+    document.getElementById('rental-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const selectedCarId = carSelect.value;
+      const customerName = document.getElementById('customer-name').value.trim();
+      const rentalDate = document.getElementById('rental-date').value;
+
+      if (!selectedCarId || !customerName || !rentalDate) {
+        alert('يرجى تعبئة جميع الحقول.');
+        return;
+      }
+
+      const car = cars.find(c => c.id == selectedCarId);
+
+      const confirmationMessage = document.getElementById('confirmation-message');
+      confirmationMessage.style.display = 'block';
+      confirmationMessage.textContent = `شكراً لك يا ${customerName}! تم حجز سيارة ${car.name} بتاريخ ${rentalDate}.`;
+
+      this.reset();
+      carSelect.selectedIndex = 0;
+    });
+
+    displayCars();
+  </script>
+
+</body>
+</html>
+
