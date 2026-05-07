@@ -1,0 +1,52 @@
+import ply.lex as lex
+import ply.yacc as yacc
+
+# ─── LEXER ────────────────────────────────────────────
+# We use 'WORD' for anything alphanumeric to avoid context errors
+reserved = {'LOGIN': 'LOGIN'}
+tokens = ['WORD'] + list(reserved.values())
+
+def t_WORD(t):
+    r'[A-Za-z0-9]+'
+    # Check if it's the 'LOGIN' keyword; otherwise, it's a generic WORD
+    t.type = reserved.get(t.value.upper(), 'WORD')
+    return t
+
+t_ignore = ' \t\n'
+
+def t_error(t):
+    print(f"Illegal character: '{t.value[0]}'")
+    t.lexer.skip(1)
+
+lexer = lex.lex()
+
+# ─── PARSER ───────────────────────────────────────────
+def p_program(p):
+    '''program : program entry 
+               | entry'''
+    pass
+
+def p_entry(p):
+    '''entry : LOGIN WORD WORD'''
+    username = p[2]
+    password = p[3]
+    
+    # Validation logic handled within the parser action
+    if password.isdigit():
+        print(f"{username:<8} → Valid Login (Numeric Password)")
+    else:
+        print(f"{username:<8} → Invalid Login (Passwords must be numeric)")
+
+def p_error(p):
+    if p:
+        print(f"Syntax error at: '{p.value}'")
+    else:
+        print("Syntax error at EOF")
+
+parser = yacc.yacc()
+
+# ─── TEST ─────────────────────────────────────────────
+data = """LOGIN Ahmed 1234
+LOGIN Ali pass"""
+
+parser.parse(data, lexer=lexer)
