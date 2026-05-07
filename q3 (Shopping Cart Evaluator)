@@ -1,0 +1,74 @@
+import ply.lex as lex
+import ply.yacc as yacc
+
+# ─── LEXER ────────────────────────────────────────────
+tokens = ['ITEM', 'QUANTITY', 'PRICE', 'X', 'AT']
+
+reserved = {
+    'x': 'X',
+}
+
+def t_ITEM(t):
+    r'[A-Za-z]+'
+    t.type = reserved.get(t.value, 'ITEM') 
+    return t
+
+def t_PRICE(t):
+    r'\d+\.\d+'
+    t.value = float(t.value)
+    return t
+
+def t_QUANTITY(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
+
+t_AT = r'@'
+t_ignore = ' \t\n'
+
+def t_error(t):
+    print(f"Illegal character: '{t.value[0]}'")
+    t.lexer.skip(1)
+
+lexer = lex.lex()
+
+# ─── PARSER ───────────────────────────────────────────
+grand_total = 0.0
+
+def p_cart_multi(p):
+    '''cart : cart line'''
+    pass
+
+def p_cart_single(p):
+    '''cart : line'''
+    pass
+
+def p_line(p):
+    '''line : ITEM X QUANTITY AT PRICE'''
+    global grand_total
+    name  = p[1]
+    qty   = p[3]
+    price = p[5]
+    total = qty * price
+    grand_total += total
+    print(f"{name:<8} x{qty}  @ {price:.2f}  = {total:6.2f} EGP")
+
+def p_error(p):
+    if p:
+        print(f"Syntax error at '{p.value}' (type: {p.type})")
+    else:
+        print("Syntax error at EOF")
+
+parser = yacc.yacc()
+
+# ─── TEST ─────────────────────────────────────────────
+data = """apple  x 3  @ 2.50
+bread  x 2  @ 5.00
+milk   x 4  @ 3.75
+banana x 6  @ 1.20"""
+
+grand_total = 0.0
+parser.parse(data, lexer=lexer)
+
+print("─" * 33)
+print(f"Grand Total           = {grand_total:6.2f} EGP")
