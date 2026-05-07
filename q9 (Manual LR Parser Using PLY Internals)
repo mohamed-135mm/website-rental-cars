@@ -1,0 +1,65 @@
+import ply.lex as lex
+from ply.yacc import Grammar, LRGeneratedTable, LRParser
+
+# ─── STEP 1: LEXER ────────────────────────────────────
+tokens = ('NUMBER', 'PLUS', 'MINUS')
+
+t_PLUS  = r'\+'
+t_MINUS = r'-'
+
+def t_NUMBER(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
+
+t_ignore = ' \t'
+
+def t_error(t):
+    print(f"Illegal character: '{t.value[0]}'")
+    t.lexer.skip(1)
+
+my_lexer = lex.lex()
+
+# ─── STEP 2–3: GRAMMAR + PRECEDENCE ──────────────────
+g = Grammar(['NUMBER', 'PLUS', 'MINUS'])
+g.set_precedence('PLUS',  'left', 1)
+g.set_precedence('MINUS', 'left', 1)
+
+# ─── STEP 4: ACTION FUNCTIONS ─────────────────────────
+def p_add(p):
+    p[0] = p[1] + p[3]    # expr = expr + NUMBER
+
+def p_sub(p):
+    p[0] = p[1] - p[3]    # expr = expr - NUMBER
+
+def p_num(p):
+    p[0] = p[1]             # expr = NUMBER
+
+def error_func(p):
+    print(f"Syntax Error: {p}")
+
+# ─── STEP 5–6: ADD PRODUCTIONS + SET START ───────────
+g.add_production('expr', ['expr', 'PLUS',  'NUMBER'], func='p_add')
+g.add_production('expr', ['expr', 'MINUS', 'NUMBER'], func='p_sub')
+g.add_production('expr', ['NUMBER'],                   func='p_num')
+g.set_start('expr')
+
+# ─── STEP 7–8: BUILD LR ITEMS + TABLE ────────────────
+g.build_lritems()
+lrtab = LRGeneratedTable(g)
+
+# ─── STEP 9: BIND CALLABLES ──────────────────────────
+lrtab.bind_callables(globals())
+
+# ─── STEP 10: PARSER ──────────────────────────────────
+parser = LRParser(lrtab, error_func)
+
+# ─── TEST ─────────────────────────────────────────────
+test_cases = [
+    ("3 + 4 - 2", 5),
+    ("10 - 3 + 7", 14),
+    ("1 + 1 + 1 + 1", 4),
+]
+for inp, expected in test_cases:
+    result = parser.parse(inp, lexer=my_lexer.clone())
+    print(f"Input: {inp:<14} → Result: {result}")
