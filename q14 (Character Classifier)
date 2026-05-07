@@ -1,0 +1,40 @@
+import ply.lex as lex
+import ply.yacc as yacc
+
+tokens = ['LETTER', 'DIGIT', 'SYMBOL']
+
+t_LETTER = r'[A-Za-z]'
+t_DIGIT  = r'[0-9]'
+t_SYMBOL = r'[^A-Za-z0-9\s]'
+t_ignore = ' \t'
+
+def t_error(t):
+    t.lexer.skip(1)
+
+lexer = lex.lex()
+
+# ─── PARSER ───────────────────────────────────────────
+def p_program_multiple(p):
+    '''program : program token'''
+    pass
+
+def p_program_single(p):
+    '''program : token'''
+    pass
+
+def p_token(p):
+    '''token : LETTER
+             | DIGIT
+             | SYMBOL'''
+    char = p[1]
+    kind = 'Letter' if char.isalpha() else ('Digit' if char.isdigit() else 'Symbol')
+    print(f"{char} → {kind}")
+
+def p_error(p):
+    print(f"Syntax error: {p}")
+
+parser = yacc.yacc()
+
+# ─── TEST ─────────────────────────────────────────────
+data = "A 5 @ b 9"
+parser.parse(data, lexer=lexer)
